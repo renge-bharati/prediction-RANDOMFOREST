@@ -26,8 +26,7 @@ st.success("✅ Model loaded successfully")
 if hasattr(model, "feature_names_in_"):
     features = model.feature_names_in_
 else:
-    features = [f"Feature {i+1}" for i in range(df1.n_features_in_)]
-
+    
 st.subheader("📥 Enter Input Features")
 
 inputs = []
