@@ -8,12 +8,12 @@ st.title("🔮 Prediction App")
 
 # Absolute path fix
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "model.pkl")
+MODEL_PATH = os.path.join(BASE_DIR, "df1.pkl")
 
 @st.cache_resource
 def load_model():
     if not os.path.exists(MODEL_PATH):
-        st.error("❌ model.pkl not found!")
+        st.error("❌ df1.pkl not found!")
         st.stop()
     with open(MODEL_PATH, "rb") as f:
         return pickle.load(f)
