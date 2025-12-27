@@ -1,48 +1,40 @@
 import streamlit as st
 import pickle
 import numpy as np
-import pandas as pd
+import os
 
-# Page config
 st.set_page_config(page_title="Prediction App", layout="centered")
+st.title("🔮 Prediction App")
 
-st.title("🔮 Machine Learning Prediction App")
+# Absolute path fix
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "model.pkl")
 
-# Load model
 @st.cache_resource
 def load_model():
-    with open("model.pkl", "rb") as f:
-        model = pickle.load(f)
-    return model
+    if not os.path.exists(MODEL_PATH):
+        st.error("❌ model.pkl not found!")
+        st.stop()
+    with open(MODEL_PATH, "rb") as f:
+        return pickle.load(f)
 
 model = load_model()
+st.success("✅ Model loaded successfully")
 
-st.success("Model loaded successfully ✅")
-
-# Try to get feature names
-feature_names = None
-
+# Get feature count safely
 if hasattr(model, "feature_names_in_"):
-    feature_names = model.feature_names_in_
+    features = model.feature_names_in_
 else:
-    st.warning("Feature names not found in model. Using manual input.")
-    feature_names = [f"Feature {i+1}" for i in range(model.n_features_in_)]
+    features = [f"Feature {i+1}" for i in range(model.n_features_in_)]
 
-st.subheader("📥 Enter Input Values")
+st.subheader("📥 Input Features")
 
-input_data = []
+inputs = []
+for feature in features:
+    val = st.number_input(feature, value=0.0)
+    inputs.append(val)
 
-for feature in feature_names:
-    value = st.number_input(f"{feature}", value=0.0)
-    input_data.append(value)
-
-input_array = np.array(input_data).reshape(1, -1)
-
-# Prediction
 if st.button("🚀 Predict"):
-    try:
-        prediction = model.predict(input_array)
-        st.success(f"✅ Prediction Result: **{prediction[0]}**")
-    except Exception as e:
-        st.error("Prediction failed ❌")
-        st.write(e)
+    data = np.array(inputs).reshape(1, -1)
+    prediction = model.predict(data)
+    st.success(f"🎯 Prediction: **{prediction[0]}**")
