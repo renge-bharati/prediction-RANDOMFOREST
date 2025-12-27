@@ -6,14 +6,15 @@ import os
 st.set_page_config(page_title="Prediction App", layout="centered")
 st.title("🔮 Prediction App")
 
-# Absolute path fix
+# Get current directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "df1.pkl")
 
 @st.cache_resource
 def load_model():
     if not os.path.exists(MODEL_PATH):
-        st.error("❌ df1.pkl not found!")
+        st.error("❌ df1.pkl NOT FOUND in repository")
+        st.write("Files in directory:", os.listdir(BASE_DIR))
         st.stop()
     with open(MODEL_PATH, "rb") as f:
         return pickle.load(f)
@@ -21,18 +22,18 @@ def load_model():
 model = load_model()
 st.success("✅ Model loaded successfully")
 
-# Get feature count safely
+# Detect features
 if hasattr(model, "feature_names_in_"):
     features = model.feature_names_in_
 else:
     features = [f"Feature {i+1}" for i in range(model.n_features_in_)]
 
-st.subheader("📥 Input Features")
+st.subheader("📥 Enter Input Features")
 
 inputs = []
 for feature in features:
-    val = st.number_input(feature, value=0.0)
-    inputs.append(val)
+    value = st.number_input(feature, value=0.0)
+    inputs.append(value)
 
 if st.button("🚀 Predict"):
     data = np.array(inputs).reshape(1, -1)
